@@ -12,6 +12,9 @@ npm test                      # unit test
 npm run dev -- --diff examples/sample.diff
 ```
 
+`npm install` จะตั้ง `core.hooksPath` ให้เอง ทำให้ hook ใน `.githooks/` ทำงาน
+(เช็คว่า `dist/` ตรงกับ `src/` ก่อน commit — ข้ามชั่วคราวด้วย `git commit --no-verify`)
+
 พอพร้อมใช้ LLM จริง แก้ `.env`:
 
 ```bash
@@ -66,7 +69,7 @@ python3 eval/run_eval.py
 ## ใช้เป็น GitHub Action
 
 1. `npm run build` แล้ว commit โฟลเดอร์ `dist/` ด้วย (Action รันจาก `dist/index.js`)
-   (workflow `check-dist` จะ fail ถ้าลืม build — ดู `.github/workflows/check-dist.yml`)
+   ถ้าลืม จะโดนจับ 2 ชั้น: pre-commit hook ในเครื่อง และ workflow `check-dist` บน GitHub
 2. ที่ repo: Settings → Secrets and variables → Actions
    - Secret `LLM_API_KEY` = key ของผู้ให้บริการ
    - Variable `LLM_PROVIDER` = `anthropic` / `openai` / `gemini`

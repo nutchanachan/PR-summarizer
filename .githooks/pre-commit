@@ -1,0 +1,28 @@
+#!/bin/sh
+# กัน dist/ ค้างเก่าตั้งแต่ก่อน commit (CI check-dist ยังจับซ้ำให้อีกชั้นตอน push)
+# ต้องการข้ามชั่วคราว: git commit --no-verify
+#
+# hook นี้ถูกเปิดใช้โดย npm script "prepare" ซึ่งตั้ง core.hooksPath ให้ตอน npm install
+
+# ไม่ได้แตะ src/ ก็ไม่ต้องเสียเวลา build
+git diff --cached --name-only --diff-filter=ACMR | grep -q '^src/' || exit 0
+
+if [ ! -d node_modules ]; then
+  echo "pre-commit: ข้ามการเช็ค dist/ เพราะยังไม่มี node_modules (รัน npm install ก่อน)" >&2
+  exit 0
+fi
+
+if ! npm run build --silent >/dev/null 2>&1; then
+  echo "pre-commit: build ไม่ผ่าน แก้ก่อนค่อย commit" >&2
+  exit 1
+fi
+
+if [ -n "$(git diff --name-only -- dist/)" ]; then
+  echo "" >&2
+  echo "pre-commit: dist/ ไม่ตรงกับ src/ — build ใหม่ให้แล้ว แต่ยังไม่ได้อยู่ใน commit" >&2
+  echo "            Action รันจาก dist/ ถ้าไม่ใส่ไปด้วย มันจะรันโค้ดเก่า" >&2
+  echo "" >&2
+  echo "  แก้โดย:   git add dist/ && git commit ..." >&2
+  echo "" >&2
+  exit 1
+fi
