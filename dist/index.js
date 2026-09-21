@@ -55,7 +55,7 @@ var SECRET_PATTERNS = [
   /xox[abpr]-[A-Za-z0-9-]{10,}/g,
   // Slack
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,
-  /((?:password|passwd|secret|api[_-]?key|token)\s*[:=]\s*["'])[^"'\n]{6,}(["'])/gi
+  /((?:password|passwd|secret|api[_-]?key|token)\s*[:=]\s*["'])(?!\[REDACTED\])[^"'\n]{6,}(["'])/gi
 ];
 function isIgnored(filename) {
   return IGNORE_PATTERNS.some((p) => p.test(filename));
@@ -299,7 +299,7 @@ var MockProvider = class {
   async complete(messages) {
     this.calls.push(messages);
     const user = messages.find((m) => m.role === "user")?.content ?? "";
-    const files = [...user.matchAll(/^### (.+)$/gm)].map((m) => m[1]);
+    const files = [...user.matchAll(/^### (\S+)/gm)].map((m) => m[1]);
     return [
       "## \u0E2A\u0E23\u0E38\u0E1B",
       `(mock) PR \u0E19\u0E35\u0E49\u0E41\u0E01\u0E49\u0E44\u0E02 ${files.length} \u0E44\u0E1F\u0E25\u0E4C`,
