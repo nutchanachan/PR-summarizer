@@ -1,0 +1,5 @@
+node_modules/
+.env
+eval/output/
+__pycache__/
+.venv/

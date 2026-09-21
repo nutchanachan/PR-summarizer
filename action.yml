@@ -1,0 +1,24 @@
+name: "PR Summarizer"
+description: "สรุป pull request อัตโนมัติด้วย LLM (สลับผู้ให้บริการได้)"
+inputs:
+  github_token:
+    description: "Token สำหรับอ่าน PR และโพสต์คอมเมนต์"
+    required: true
+  llm_provider:
+    description: "anthropic | openai | gemini | mock"
+    default: "mock"
+  llm_model:
+    description: "ชื่อ model (ไม่ใส่ = ใช้ default ของแต่ละเจ้า)"
+    required: false
+  llm_api_key:
+    description: "API key ของผู้ให้บริการที่เลือก"
+    required: false
+  summary_language:
+    description: "th | en"
+    default: "th"
+  max_diff_chars:
+    description: "งบตัวอักษรของ diff ที่ส่งให้ LLM"
+    default: "60000"
+runs:
+  using: "node20"
+  main: "dist/index.js"

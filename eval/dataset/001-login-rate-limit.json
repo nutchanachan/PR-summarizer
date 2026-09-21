@@ -1,0 +1,16 @@
+{
+  "id": "001-login-rate-limit",
+  "description": "แก้ SQL injection + เพิ่ม rate limit ตอน login แต่เผลอ hardcode API key",
+  "diff_file": "../../examples/sample.diff",
+  "title": "Harden login endpoint",
+  "reference_summary": "เปลี่ยน query login เป็น parameterized query เพื่อกัน SQL injection และเพิ่ม rate limit 5 ครั้งต่อ email ต้องรีวิว: มี API key hardcode ใน config.ts และ rate limit ถูกเช็กหลังค้นหา user ทำให้ email ที่ไม่มีอยู่ไม่ถูกจำกัด",
+  "must_mention": [
+    ["sql injection", "parameterized", "\\$1"],
+    ["rate.?limit"],
+    ["hardcode", "api.?key", "secret"]
+  ],
+  "must_not_mention": [
+    "migration",
+    "ioredis"
+  ]
+}
