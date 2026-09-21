@@ -66,6 +66,7 @@ python3 eval/run_eval.py
 ## ใช้เป็น GitHub Action
 
 1. `npm run build` แล้ว commit โฟลเดอร์ `dist/` ด้วย (Action รันจาก `dist/index.js`)
+   (workflow `check-dist` จะ fail ถ้าลืม build — ดู `.github/workflows/check-dist.yml`)
 2. ที่ repo: Settings → Secrets and variables → Actions
    - Secret `LLM_API_KEY` = key ของผู้ให้บริการ
    - Variable `LLM_PROVIDER` = `anthropic` / `openai` / `gemini`

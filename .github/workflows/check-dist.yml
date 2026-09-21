@@ -1,0 +1,44 @@
+name: Check dist
+
+# dist/index.js คือไฟล์ที่ Action รันจริง (ดู action.yml -> main: dist/index.js)
+# GitHub ไม่ได้ build ให้ตอนรัน ถ้าแก้ src/ แล้วลืม commit dist/ Action จะรันโค้ดเก่าแบบเงียบๆ
+# workflow นี้ build ใหม่แล้วเทียบกับที่ commit ไว้ ถ้าไม่ตรงให้ fail
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: เทียบ dist/ ที่ commit ไว้ กับที่เพิ่ง build
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "::error::dist/ ไม่ตรงกับ src/ — รัน 'npm run build' แล้ว commit dist/ ไปด้วย"
+            git diff --stat dist/
+            exit 1
+          fi
+          echo "dist/ ตรงกับ src/ แล้ว"
+
+      # bundle เป็นไฟล์บรรทัดยาว อ่าน diff ใน log ไม่รู้เรื่อง โหลดตัวที่ build ได้ไปเทียบเองสะดวกกว่า
+      - name: เก็บ dist ที่ build ได้ไว้ให้ดาวน์โหลด
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-ที่ควรจะเป็น
+          path: dist/
